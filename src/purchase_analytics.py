@@ -1,5 +1,15 @@
 import csv
+import sys
+import os
 
+if not len(sys.argv) == 4:
+    print ("Invalid number of arguments. Run as: python ./src/purchase_analytics.py ./input/order_products.csv ./input/products.csv ./output/report.csv")
+    sys.exit()
+
+input_file_1 = sys.argv[1]
+input_file_2 = sys.argv[2]
+output_file = sys.argv[3]
+    
 ##define all functions here:
 def reduce_order(my_dict, reader):
     
@@ -45,14 +55,14 @@ def reduce_first_order(my_dict, dept_reorder):
 
 
 # read the product_id and department_id as key-value pairs
-with open('../input/products.csv') as f:
+with open(input_file_2) as f:
   reader = csv.DictReader(f)
 
   output_department_product = dict(map (lambda x: (x['product_id'], x['department_id']), reader))
   
   
 # read the product_id and reorder status as key-value pairs  
-with open('../input/order_products.csv') as f:
+with open(input_file_1) as f:
   reader = csv.DictReader(f)
   #product_order_first_time = list(map(lambda x: x[0],list(filter( lambda x: x[1]== '0',list(map(lambda x: (x['product_id'],x['reordered']),reader))))))
   product_order_first_time = dict(map(lambda x: (x['product_id'], x['reordered']),reader))
@@ -60,7 +70,7 @@ with open('../input/order_products.csv') as f:
   
 ### sum products by order id:
 
-with open('../input/order_products.csv') as f:
+with open(input_file_1) as f:
   reader = csv.DictReader(f)
   order_product = dict(map(lambda x: (x[0][0], x[1]),list(reduce(reduce_order,reader,{}).items())))
   
@@ -96,7 +106,7 @@ output.sort(key = lambda x: int(x[0]))
 
 ## write the results to a file:
 
-with open("../output/report.csv",'wb') as resultFile:
+with open(output_file,'wb') as resultFile:
     wr = csv.writer(resultFile)
     wr.writerow(['department_id','number_of_orders','number_of_first_orders','percentage'])
     for row in output:
