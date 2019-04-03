@@ -1,0 +1,101 @@
+import csv
+
+##define all functions here:
+def reduce_order(my_dict, reader):
+  tup = (reader['product_id'], reader['order_id'])
+  if tup not in my_dict.keys():
+        my_dict[tup] = 1
+  else:
+        my_dict[tup] += 1
+        
+  return my_dict
+  
+def sum_dept(my_dict,new):
+  dept = new[1][0]
+  qty = int(new[1][1])
+  
+  if dept not in my_dict.keys():
+    my_dict[dept] = qty
+  else:
+    my_dict[dept] += qty
+    
+  return my_dict
+
+
+
+def reduce_first_order(my_dict, dept_reorder):
+  
+  if dept_reorder[1][0] not in my_dict.keys():
+    if dept_reorder[1][1] == '0':
+      my_dict[dept_reorder[1][0]] = 1
+ 
+    else:
+      my_dict[dept_reorder[1][0]] = 0
+      
+  else:
+    if dept_reorder[1][1] == '0':
+        my_dict[dept_reorder[1][0]] += 1
+
+      
+  return my_dict    
+
+
+
+
+# read the product_id and department_id as key-value pairs
+with open('products.csv') as f:
+  reader = csv.DictReader(f)
+
+  output_department_product = dict(map (lambda x: (x['product_id'], x['department_id']), reader))
+  
+  
+# read the product_id and reorder status as key-value pairs  
+with open('order_products.csv') as f:
+  reader = csv.DictReader(f)
+  #product_order_first_time = list(map(lambda x: x[0],list(filter( lambda x: x[1]== '0',list(map(lambda x: (x['product_id'],x['reordered']),reader))))))
+  product_order_first_time = dict(map(lambda x: (x['product_id'], x['reordered']),reader))
+  
+  
+### sum products by order id:
+
+with open('order_products.csv') as f:
+  reader = csv.DictReader(f)
+  order_product = dict(map(lambda x: (x[0][0], x[1]),list(reduce(reduce_order,reader,{}).items())))
+  
+    
+  
+# combine dictionary output_department_product and order_product to map the total number of product orders to the department , based on the common key product_id
+orders_sum_by_dept = {key: (value , order_product[key])  for key, value in output_department_product.iteritems()}  
+
+
+# use the reduce function to obtain the total number of orders by department
+dept_prod_total = dict(reduce(sum_dept,orders_sum_by_dept.iteritems(),{}).items())
+
+#combine the dictionary department_product and product_order_first_time to map the reorder status directly to the department id,based on the common key product_id
+dept_prod_reorder  = {key: (value , product_order_first_time[key])  for key, value in output_department_product.iteritems()}
+
+
+# use the reduce function to obtain the total number of prdoucts ordered for the first time in each department
+dept_reord_total = reduce(reduce_first_order,dept_prod_reorder.items(),{})
+
+
+#combine the dictionaries dept_prod_total and dept_reord_total 
+dept_prod_reord_total = {key: (value , dept_reord_total[key])  for key, value in dept_prod_total.iteritems()}
+
+#A department_id should be listed only if number_of_orders is greater than 0
+output_filtered = filter(lambda x: x[1][0]>0,dept_prod_reord_total.items())
+
+
+output = map(lambda x: (x[0],x[1][0], x[1][1], format(x[1][1]/ float(x[1][0]),'.2f')),output_filtered )
+
+# It is listed in ascending order by department_id
+output.sort(key = lambda x: int(x[0]))
+
+
+## write the results to a file:
+resultFile = open("report.csv",'wb')
+with open("report.csv",'wb') as resultFile:
+    wr = csv.writer(resultFile)
+    wr.writerow(['department_id','number_of_orders','number_of_first_orders','percentage'])
+    for row in output:
+      wr.writerow(row)
