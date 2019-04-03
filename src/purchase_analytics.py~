@@ -87,7 +87,8 @@ orders_sum_by_dept = {key: (value , order_product[key])  for key, value in outpu
 
 # use the reduce function to obtain the total number of orders by department
 dept_prod_total = dict(reduce(sum_dept,orders_sum_by_dept.iteritems(),{}).items())
-
+print(dept_prod_total)
+print(sum(dept_prod_total.values()))
 #combine the dictionary department_product and product_order_first_time to map the reorder status directly to the department id,based on the common key product_id
 dept_prod_reorder  = {key: (value , product_order_first_time[key])  for key, value in output_department_product.iteritems()}
 
