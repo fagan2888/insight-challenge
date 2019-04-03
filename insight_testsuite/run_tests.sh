@@ -53,7 +53,7 @@ function setup_testing_input_output {
   rm -r ${TEST_OUTPUT_PATH}/output/*
   cp -r ${GRADER_ROOT}/tests/${test_folder}/input/order_products.csv ${TEST_OUTPUT_PATH}/input/order_products.csv
   cp -r ${GRADER_ROOT}/tests/${test_folder}/input/products.csv ${TEST_OUTPUT_PATH}/input/products.csv
-  cp -r ${GRADER_ROOT}/tests/${test_folder}/output/report.csv ${TEST_OUTPUT_PATH}/input/report.csv
+  cp -r ${GRADER_ROOT}/tests/${test_folder}/output/report.csv ${TEST_OUTPUT_PATH}/output/report.csv
 }
 
 function compare_outputs {
