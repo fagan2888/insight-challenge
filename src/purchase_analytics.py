@@ -2,6 +2,8 @@ import csv
 
 ##define all functions here:
 def reduce_order(my_dict, reader):
+    
+  
   tup = (reader['product_id'], reader['order_id'])
   if tup not in my_dict.keys():
         my_dict[tup] = 1
@@ -43,14 +45,14 @@ def reduce_first_order(my_dict, dept_reorder):
 
 
 # read the product_id and department_id as key-value pairs
-with open('products.csv') as f:
+with open('../input/products.csv') as f:
   reader = csv.DictReader(f)
 
   output_department_product = dict(map (lambda x: (x['product_id'], x['department_id']), reader))
   
   
 # read the product_id and reorder status as key-value pairs  
-with open('order_products.csv') as f:
+with open('../input/order_products.csv') as f:
   reader = csv.DictReader(f)
   #product_order_first_time = list(map(lambda x: x[0],list(filter( lambda x: x[1]== '0',list(map(lambda x: (x['product_id'],x['reordered']),reader))))))
   product_order_first_time = dict(map(lambda x: (x['product_id'], x['reordered']),reader))
@@ -58,7 +60,7 @@ with open('order_products.csv') as f:
   
 ### sum products by order id:
 
-with open('order_products.csv') as f:
+with open('../input/order_products.csv') as f:
   reader = csv.DictReader(f)
   order_product = dict(map(lambda x: (x[0][0], x[1]),list(reduce(reduce_order,reader,{}).items())))
   
@@ -93,8 +95,8 @@ output.sort(key = lambda x: int(x[0]))
 
 
 ## write the results to a file:
-resultFile = open("report.csv",'wb')
-with open("report.csv",'wb') as resultFile:
+
+with open("../output/report.csv",'wb') as resultFile:
     wr = csv.writer(resultFile)
     wr.writerow(['department_id','number_of_orders','number_of_first_orders','percentage'])
     for row in output:
